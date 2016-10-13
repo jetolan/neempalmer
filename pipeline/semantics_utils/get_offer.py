@@ -20,7 +20,6 @@ def get_offer(company, sem3_id):
  sem3.offers_field("offset", 0)
 
  # Run the request
- #results = sem3.get_products()
  results = sem3.get_offers()
 
  #this is how many results were
@@ -100,7 +99,6 @@ def get_offer(company, sem3_id):
  if not os.path.exists(directory):
   os.makedirs(directory)
 
- #fname= directory+"/"+sem3_id+".p"
  fname= directory+"/"+sem3_id+".csv"
  print "saving "+fname+"..."
  #pickle.dump(data, open(fname, "wb" ) )
