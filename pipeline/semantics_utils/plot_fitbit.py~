@@ -1,0 +1,137 @@
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d
+import time
+from matplotlib.gridspec import GridSpec
+
+name_in="Fitbit" 
+directory="data/"
+data=pd.read_csv(str(directory+name_in+"_mod.csv"), sep=',', header=0, engine='python')
+
+time_dd=np.array([datetime.strptime(x, '%Y-%m-%dT%H:%M:%SZ') for x in data["LASTRECORDED'"]])
+
+delt=np.array([float(x) for x in data['FRACTIONAL_PRICE_CHANGE']])
+
+#these are too big
+dd1=delt[delt<3]
+tt1=time_dd[delt<3]
+
+#these are zero
+dd=dd1[dd1!=0]
+tt=tt1[dd1!=0]
+
+#order by time
+x=np.array([time.mktime(x.timetuple()) for x in tt])
+aa=np.argsort(x)
+xt=x[aa]
+dt=dd[aa]
+
+#remove the first two points
+xt=xt[2:]
+dt=dt[2:]
+
+#convert back to datetime
+xx = np.array([datetime.fromtimestamp(x) for x in xt])
+
+#plotting setup
+plt.figure(0, figsize=(12, 8))
+gs1 = GridSpec(2, 3)
+gs1.update(left=0.15, right=0.95, wspace=0.3, hspace=0.15)
+ax1 = plt.subplot(gs1[0,:])
+
+#plot top figure
+#plt.clf()
+#plt.figure(figsize=(18, 6))
+#these are negative change
+s1=plt.scatter(xx[dt<0], dt[dt<0], c='r', s = 60, lw = 0, alpha=0.7)
+
+#these are postive change
+s2=plt.scatter(xx[dt>0], dt[dt>0], c='b', s = 60, lw = 0, alpha=0.7)
+
+#plot the running average
+N=10
+g=np.convolve(dt, np.ones((N,))/N, mode='valid')
+lin,=plt.plot(xx[5:-4], g, 'g', linewidth=2, alpha=.7)
+
+plt.plot(xx, np.zeros(len(xx)), '--', color='gray')
+
+quarters=['2015-06-30', '2015-09-30', '2015-12-31', '2016-03-31', '2016-06-30', '2016-09-30']
+for i in quarters:
+ plt.plot([i,i], [-1,1], color='gray')
+
+plt.ylabel('Fractional change')
+#plt.xlabel('Date')
+plt.ylim([-1,1])
+plt.title(str(name_in))
+plt.legend([s2,s1,lin], ['Increase in vendor price', 'Decrease in vendor price', 'running average (N=10)'], loc=2) 
+
+#--------------------------------------------
+#now plot bottome figure
+
+#plot histograms
+#bins = np.linspace(0, 1, 10)
+#bin_means = (np.histogram(dt, bins, weights=dt)[0] /
+#             np.histogram(dt, bins)[0])
+
+quarters=['2015-09-30', '2015-12-31', '2016-03-31', '2016-06-30', '2016-09-30']
+bins=[datetime.strptime(x, '%Y-%m-%d') for x in quarters]
+bins_sec=np.array([time.mktime(x.timetuple()) for x in bins])
+inds = np.digitize(xt, bins_sec)
+bin_height=[np.mean(dt[inds==bin]) for bin in np.unique(inds)]   
+#now make array of len(inds) that has bin_height for all
+val=np.zeros(len(inds))
+for bin in np.unique(inds):
+    val[inds==bin]=bin_height[bin]
+
+#lin2=plt.plot(xx, val, 'r', linewidth=2, alpha=.7)
+    
+# get fitbit stock price
+fitdata = np.genfromtxt(str(directory+"Fitbit_Stock.csv"), dtype='string', delimiter=',')
+
+sdate=[datetime.strptime(x, '%m/%d/%y') for x in fitdata[:,0]]
+sclose=fitdata[:,4].astype(np.float)
+
+#fractional price change
+sdiff=np.zeros(len(sclose))
+sdiff[1:]=np.diff(sclose)  #first element has to be zero
+sfrac=sdiff/sclose
+
+#FIT annouce dates
+annouce=['11/02/2015', '02/22/2016', '05/04/2016', '08/02/2016']
+adates=[datetime.strptime(x, '%m/%d/%Y') for x in annouce]
+adates_sec=np.array([time.mktime(x.timetuple()) for x in adates])
+sdates_sec=np.array([time.mktime(x.timetuple()) for x in sdate])
+
+arr_annouce=np.in1d(sdates_sec, adates_sec) #where annoucements line up
+afrac=sfrac[arr_annouce]
+afrac=np.flipud(afrac)
+
+
+#plot bottom figure
+ax2 = plt.subplot(gs1[1,:])
+
+#fig = plt.figure()
+#ax = fig.add_subplot(111)
+lin,=plt.plot(sdate, sfrac)
+for xy in zip(adates, afrac):
+    ax2.annotate('(%s, %s)' % xy, xy=xy, textcoords='data')
+
+plt.scatter(adates, afrac)
+lin2,=plt.plot(xx, val, 'r', linewidth=2, alpha=.7)
+plt.plot(xx, np.zeros(len(xx)), '--', color='gray')
+
+#plt.title('FIT fractional day change in price (labeled on sales annoucement days)')
+#plt.xlabel('Date')
+plt.ylabel('Fractional change')
+plt.legend([lin,lin2], ['Stock price change over one day (labeled on sales annoucement days)', 'Vendor price change, averaged over quarters'], loc=2) 
+plt.ylim([-.2, .4])
+plt.show()
+plt.savefig(str(name_in+'.pdf'), format='pdf')
+
+
+#save outputs
+import pickle
+dd={'quarters':quarters,  'val':val, 'afrac':afrac, 'adates':adates}
+pickle.dump(dd, open( "fit.p", "wb" ) )

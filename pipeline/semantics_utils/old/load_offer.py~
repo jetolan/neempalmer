@@ -1,0 +1,22 @@
+  availability=[]
+  condition=[]
+  currency=[]
+  u'firstrecorded_at': u'2013-07-31T17:46:40.000Z',
+  u'id': u'2tE7a5Nkps2UKASm0oMAEI',
+ lastrecorded_at=[]
+ price=[]
+ seller=[]
+ shipping=[]
+ sitedetails_name=[]
+ sku=[]
+
+
+for dd in data:
+    ava.append(str(offer['price'].encode('ascii','ignore')))   
+    price.append(str(offer['price'].encode('ascii','ignore')))
+
+
+head="""'NAME, SEM3_ID, UPC, EAN, GTINS, UPDATED_AT, CREATED_AT, SELLER, PRICE, CURRENCY, ID, AVAILABILITY, FIRSTRECORDED, LASTRECORDED'"""     
+
+print 'saving '+str(directory+name_in+".csv")+'...'
+np.savetxt(str(directory+name_in+".csv"), np.column_stack((names, sem3_id, upc, ean, gtins, updated_at, created_at, seller, price, currency, id, avail, firstrecorded, lastrecorded)), delimiter=", ", fmt='%s', header=head)  

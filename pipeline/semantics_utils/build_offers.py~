@@ -1,0 +1,8 @@
+#this function takes the csv files of offers and builds grand csv file
+
+import os
+import numpy as np
+
+#list of waypoint files
+fn=os.listdir('halfmile_gps')
+#fn = filter(lambda x: 'waypoints.gpx' in x.lower(),os.listdir('halfmile_gps'))
