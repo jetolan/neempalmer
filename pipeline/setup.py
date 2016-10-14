@@ -14,6 +14,6 @@ setup(name='neempalmer',
       url='https://github.com/jetolan/neempalmer',
       license='MIT',
       packages=['semantics_utils'],
-      package_dir={'semantics_utils': 'semantics_utilssrc/mypkg'},
+      package_dir={'semantics_utils': 'semantics_utils'},
       install_requires=['numpy', 'pandas']
       )
