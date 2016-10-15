@@ -15,5 +15,5 @@ setup(name='neempalmer',
       license='MIT',
       packages=['semantics_utils'],
       package_dir={'semantics_utils': 'semantics_utils'},
-      install_requires=['numpy', 'pandas']
+      install_requires=['numpy', 'pandas', 'semantics3']
       )
