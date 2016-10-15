@@ -1,1 +1,29 @@
-# neempalmer
+# neempalmer pipeline
+
+
+
+
+# INSTALL:
+# python setup.py install
+#
+# You'll also need to get the module: semantics.py from Jamie or Raj
+# which contains the semantics API code and key
+
+
+
+
+
+# RUN:
+#
+# You shoul'd be able to fetch data running:
+#
+# python upper_data.py <company>
+# OR:
+# >>from upper_data import fetch
+# >>fetch ('<company>')
+#
+# e.g., where <company>='Movado'
+#
+# This will create csv files and plot the offers data.
+#
+# Note that getting the data is fairly slow due to Semantics API call limits
