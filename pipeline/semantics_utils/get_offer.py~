@@ -7,8 +7,16 @@ import pickle
 import semantics
 import os
 import numpy as np
+import ipdb
 
 def get_offer(company, sem3_id):
+ data=run_query(company,sem3_id)
+
+ 
+ 
+ return
+ 
+def run_query(company, sem3_id):
  sem3=semantics.apikey()
 
  #sem3_id='4buXkdTf9sWCi0OIsYAIuS'
@@ -20,7 +28,6 @@ def get_offer(company, sem3_id):
  sem3.offers_field("offset", 0)
 
  # Run the request
- #results = sem3.get_products()
  results = sem3.get_offers()
 
  #this is how many results were
@@ -29,7 +36,7 @@ def get_offer(company, sem3_id):
 
  # Specify a cache size
  sem3.cache(5)
-
+ ipdb.set_trace()
  # Iterate through the results
  page_no = 0
  no_pages=(int(results['total_results_count']))/int(results['results_count'])
@@ -49,7 +56,9 @@ def get_offer(company, sem3_id):
      sem3.offers_field("offset", i*int(results['results_count']))
      sleep(1) #respect rate limit
 
+ return data    
 
+def 
  #now make variables from dictionary:
  avail=[]
  condition=[]
@@ -100,10 +109,8 @@ def get_offer(company, sem3_id):
  if not os.path.exists(directory):
   os.makedirs(directory)
 
- #fname= directory+"/"+sem3_id+".p"
  fname= directory+"/"+sem3_id+".csv"
  print "saving "+fname+"..."
- #pickle.dump(data, open(fname, "wb" ) )
  np.savetxt(str(fname), np.column_stack((seller, price, condition, currency, id, avail, firstrecorded_at, lastrecorded_at, sitedetails_name, sku)), delimiter=", ", fmt='%s', header=head)  
  
 

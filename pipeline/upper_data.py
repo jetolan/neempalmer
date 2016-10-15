@@ -8,6 +8,7 @@ import os
 from semantics_utils import get_data
 from semantics_utils import load_data
 from semantics_utils import drive_offers
+from semantics_utils import plot_data
 
 #if data file doesn't exist, make it
 directory="data"
@@ -26,3 +27,6 @@ if not os.path.exists(data_file):
  
 #once data file exists, go through and get all sem3_id's in it
 drive_offers.control(name_in)
+
+#and finally, plot data:
+plot_data.initial(name_in)

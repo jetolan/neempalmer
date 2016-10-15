@@ -8,7 +8,17 @@ import semantics
 import os
 import numpy as np
 
+
+
+
 def get_offer(company, sem3_id):
+ data=run_query(company, sem3_id)
+ make_csv(company, sem3_id, data)
+ return
+
+
+
+def run_query(company, sem3_id):
  sem3=semantics.apikey()
 
  #sem3_id='4buXkdTf9sWCi0OIsYAIuS'
@@ -28,11 +38,14 @@ def get_offer(company, sem3_id):
 
  # Specify a cache size
  sem3.cache(5)
-
  # Iterate through the results
  page_no = 0
- no_pages=(int(results['total_results_count']))/int(results['results_count'])
+
  data=[]
+ if results['results_count']==0:
+  return data
+ 
+ no_pages=(int(results['total_results_count']))/int(results['results_count'])
  for i in range(no_pages):
      results = sem3.get_offers()
      print "We are at page = %s" % page_no
@@ -48,7 +61,17 @@ def get_offer(company, sem3_id):
      sem3.offers_field("offset", i*int(results['results_count']))
      sleep(1) #respect rate limit
 
+ return data    
 
+def make_csv(company, sem3_id, data):
+
+ #if directory doesn't exist, make it
+ directory=str("data/"+company)
+ if not os.path.exists(directory):
+  os.makedirs(directory)
+
+ fname= directory+"/"+sem3_id+".csv"
+ 
  #now make variables from dictionary:
  avail=[]
  condition=[]
@@ -62,7 +85,14 @@ def get_offer(company, sem3_id):
  sitedetails_name=[]
  sku=[]
 
+ head="""SELLER, PRICE, CONDITION, CURRENCY, ID, AVAILABILITY, FIRSTRECORDED, LASTRECORDED, SITEDETAILS_NAME, SKU""" 
+ 
+ #if data was empty, just save empty file
+ if not data:
+   np.savetxt(str(fname), np.column_stack((seller, price, condition, currency, id, avail, firstrecorded_at, lastrecorded_at, sitedetails_name, sku)), delimiter=", ", fmt='%s', header=head) 
+   return
 
+ 
  for offer in data:
     if 'availability' in offer.keys():
      av=str(offer['availability'].encode('ascii','ignore'))
@@ -88,23 +118,12 @@ def get_offer(company, sem3_id):
     sitedetails_name.append(str(offer['sitedetails_name'].encode('ascii','ignore')))
     sku.append(str(offer['sku'].encode('ascii','ignore')))
     
- head="""SELLER, PRICE, CONDITION, CURRENCY, ID, AVAILABILITY, FIRSTRECORDED, LASTRECORDED, SITEDETAILS_NAME, SKU""" 
- 
 
  #-----#
- 
-     
- #if directory doesn't exist, make it
- directory=str("data/"+company)
- if not os.path.exists(directory):
-  os.makedirs(directory)
-
- fname= directory+"/"+sem3_id+".csv"
  print "saving "+fname+"..."
- #pickle.dump(data, open(fname, "wb" ) )
  np.savetxt(str(fname), np.column_stack((seller, price, condition, currency, id, avail, firstrecorded_at, lastrecorded_at, sitedetails_name, sku)), delimiter=", ", fmt='%s', header=head)  
  
-
+ return
 
 ###################################
 

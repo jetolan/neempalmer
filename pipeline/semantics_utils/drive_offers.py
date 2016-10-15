@@ -15,7 +15,7 @@ def control(name_in):
 
  #if directory doesn't exist, make it
  if not os.path.exists(directory+'/'+name_in):
-  os.makedirs(directory+'/'+name_in)
+     os.makedirs(directory+'/'+name_in)
 
  for id in np.unique(data['SEM3_ID']):
      if id+'.csv' not in os.listdir(directory+'/'+name_in):
@@ -25,7 +25,11 @@ def control(name_in):
  #now combine all the offers into one csv
  #we can then use this to build models or make
  #figures
- build_offers(name_in)
+
+ #if file "comany+mod+.csv" doesn't exist, make it from all
+ # files in company folder
+ if not os.path.exists(directory+'/'+name_in+'mod.csv'):
+     build_offers(name_in)
       
  return    
     

@@ -53,6 +53,8 @@ def build_offers(company):
                 last_price=float(pp)
                 price=float(dd['PRICE'])
                 g=pd.Series({"PRICE_DIFF":str(price-last_price)})
+                if last_price==0: #prevent zero division
+                    last_price=float('NaN')
                 gg=pd.Series({"FRACTIONAL_PRICE_CHANGE":str((price-last_price) / last_price)})
                 sem=pd.Series({"SEM3_ID":sem3_id})
                 df = pd.concat([sem, dd, g,gg])
