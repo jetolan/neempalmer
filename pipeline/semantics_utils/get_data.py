@@ -43,7 +43,7 @@ def company(name_in):
         sleep(1) #respect rate limit
 
     #save data as pickle in data directory
-    directory="../data/"
+    directory="data/"
     if not os.path.exists(directory):
      os.makedirs(directory)    
 
